@@ -122,6 +122,33 @@ body {
   letter-spacing: 0.01em;
 }
 
+/* ---------- Set switcher ---------- */
+.set-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.set-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.set-link:hover { background: var(--paper-3); border-color: var(--ink-faint); color: var(--ink); }
+.set-link.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 /* ---------- Buttons ---------- */
 .btn {
   font-family: var(--serif-body);

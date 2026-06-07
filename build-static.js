@@ -23,6 +23,7 @@ const fs = require('fs');
 const sharp = require('sharp');
 const heicConvert = require('heic-convert');
 const { readGps, isHeic } = require('./lib/process-photo');
+const { assignSets, NUM_SETS } = require('./lib/sets');
 
 // Keep these in lockstep with server.js so the static output is byte-for-byte
 // the same as what the live server would produce.
@@ -172,9 +173,11 @@ async function build() {
     console.log('  ✓ ' + name + (gps ? '  (placed)' : '  (no GPS)'));
   }
 
+  assignSets(manifest); // adds `sets` to each photo
+
   fs.writeFileSync(
     path.join(OUT_DIR, 'photos.json'),
-    JSON.stringify({ count: manifest.length, placed: placed, photos: manifest })
+    JSON.stringify({ count: manifest.length, placed: placed, numSets: NUM_SETS, photos: manifest })
   );
 
   console.log(

@@ -6,6 +6,7 @@ const express = require('express');
 const sharp = require('sharp');
 const heicConvert = require('heic-convert');
 const { readGps, isHeic } = require('./lib/process-photo');
+const { assignSets, NUM_SETS } = require('./lib/sets');
 
 const app = express();
 
@@ -79,6 +80,7 @@ async function buildManifest() {
       full: 'photo/' + encodeURIComponent(name),
     });
   }
+  assignSets(out); // adds `sets` to each photo
   MANIFEST = out;
 }
 
@@ -88,7 +90,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // static build (build-static.js) expose it at the same relative URL.
 app.get('/photos.json', function (req, res) {
   const placed = MANIFEST.filter(function (p) { return p.hasGps; }).length;
-  res.json({ count: MANIFEST.length, placed: placed, photos: MANIFEST });
+  res.json({ count: MANIFEST.length, placed: placed, numSets: NUM_SETS, photos: MANIFEST });
 });
 
 // Small square thumbnail for the circular pins + side panel. EXIF-rotated so

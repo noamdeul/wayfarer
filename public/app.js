@@ -15,7 +15,17 @@
   L.tileLayer(TILE_URL, { subdomains: 'abcd', maxZoom: 20, attribution: TILE_ATTR }).addTo(map);
 
   // ---------- State ----------
-  var items = [];   // { id, name, status, lat, lng, thumb, full, marker }
+  var items = [];   // { id, name, status, lat, lng, thumb, full, sets, marker }
+  var numSets = 0;  // how many sets the manifest defines (0 = sets disabled)
+
+  // Which set the URL asks for, e.g. ?set=2. Returns null for "show everything"
+  // (no/blank param) or an out-of-range value.
+  function activeSet() {
+    var raw = new URLSearchParams(location.search).get('set');
+    if (raw == null || raw === '') return null;
+    var n = parseInt(raw, 10);
+    return (n >= 1 && n <= numSets) ? n : null;
+  }
 
   // ---------- DOM ----------
   var $ = function (id) { return document.getElementById(id); };
@@ -67,6 +77,7 @@
       })
       .then(function (data) {
         var photos = (data && data.photos) || [];
+        numSets = (data && data.numSets) || 0;
         items = photos.map(function (p) {
           return {
             id: p.id,
@@ -77,9 +88,18 @@
             thumb: p.thumb,
             crop: p.crop,
             full: p.full,
+            sets: p.sets || null,
             marker: null,
           };
         });
+
+        // Narrow to the requested set (if any) before anything is drawn, so
+        // each location shows just one photo. No/blank ?set → show everything.
+        var set = activeSet();
+        if (set != null) {
+          items = items.filter(function (it) { return it.sets && it.sets.indexOf(set) !== -1; });
+        }
+        buildSetSwitcher(set);
 
         items.forEach(function (item) { if (item.status === 'placed') addMarker(item); });
         render();
@@ -259,6 +279,28 @@
       panelSummary.textContent = parts.join('  ·  ');
       topMeta.textContent = placed.length + ' places · ' + items.length + ' photos';
     }
+  }
+
+  // ---------- Set switcher ----------
+  // Links the header chips to ?set=N (and "All" back to the unfiltered view).
+  // Each link is a plain navigation — the page reloads and reads the new ?set.
+  function buildSetSwitcher(active) {
+    var nav = $('setSwitcher');
+    if (!nav) return;
+    if (!numSets) { nav.hidden = true; return; }
+
+    function chip(href, label, on) {
+      return '<a class="set-link' + (on ? ' is-active' : '') + '"' +
+             (on ? ' aria-current="true"' : '') + ' href="' + href + '">' + label + '</a>';
+    }
+
+    var base = location.pathname;
+    var html = chip(base, 'All', active == null);
+    for (var s = 1; s <= numSets; s++) {
+      html += chip(base + '?set=' + s, 'Set ' + s, active === s);
+    }
+    nav.innerHTML = html;
+    nav.hidden = false;
   }
 
   // ---------- Collapsible side panel ----------

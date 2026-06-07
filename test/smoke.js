@@ -13,6 +13,7 @@
 
 const assert = require('assert');
 const { processPhoto, isHeic } = require('../lib/process-photo');
+const { assignSets, NUM_SETS } = require('../lib/sets');
 
 // 1x1 transparent PNG — no EXIF, no GPS.
 const PNG_1x1 = Buffer.from(
@@ -43,6 +44,23 @@ function makeFtyp(brand) {
   assert.strictEqual(isHeic('mystery', 'application/octet-stream', makeFtyp('heic')), true, 'detect by magic bytes (heic)');
   assert.strictEqual(isHeic('mystery', 'application/octet-stream', makeFtyp('mif1')), true, 'detect by magic bytes (mif1)');
   assert.strictEqual(isHeic('photo.jpg', 'image/jpeg', PNG_1x1), false, 'a JPEG/PNG is not HEIC');
+
+  // (4) Set assignment: each set shows at most one photo per location, the same
+  // photo may span several sets, and lone/un-located photos appear in every set.
+  const A = { hasGps: true, lat: 32.0, lng: 34.0 };           // location 1
+  const B = { hasGps: true, lat: 32.0000449, lng: 34.0 };     // ~5 m from A → same location
+  const C = { hasGps: true, lat: 32.01, lng: 34.0 };          // ~1.1 km away → its own location
+  const D = { hasGps: false, lat: null, lng: null };          // no GPS
+  assignSets([A, B, C, D]);
+
+  assert.deepStrictEqual(A.sets.filter((s) => B.sets.includes(s)), [],
+    'two photos at the same location must never share a set');
+  assert.deepStrictEqual(
+    A.sets.concat(B.sets).sort(),
+    Array.from({ length: NUM_SETS }, (_, i) => i + 1),
+    'the near-duplicate pair should together cover every set');
+  assert.strictEqual(C.sets.length, NUM_SETS, 'a lone photo appears in every set');
+  assert.strictEqual(D.sets.length, NUM_SETS, 'an un-located photo appears in every set');
 
   // empty input rejected
   let threw = false;
