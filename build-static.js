@@ -38,6 +38,10 @@ const THUMB_QUALITY = 72;
 const PHOTO_MAX = 2200;
 const PHOTO_QUALITY = 82;
 const CROP_FRACTION = 0.4;
+// mozjpeg ≈ 20-30% smaller at the same visual quality; progressive streams
+// top-down. Kept identical to server.js so the static output matches the live
+// server byte-for-byte.
+const JPEG_OPTS = { mozjpeg: true, progressive: true };
 
 function mimeFromName(name) {
   if (/\.png$/i.test(name)) return 'image/png';
@@ -70,7 +74,7 @@ async function makeThumb(viewable) {
   return sharp(viewable.buffer)
     .rotate()
     .resize(THUMB_SIZE, THUMB_SIZE, { fit: 'cover', position: 'centre' })
-    .jpeg({ quality: THUMB_QUALITY })
+    .jpeg({ quality: THUMB_QUALITY, ...JPEG_OPTS })
     .toBuffer();
 }
 
@@ -78,7 +82,7 @@ async function makePhoto(viewable) {
   return sharp(viewable.buffer)
     .rotate()
     .resize(PHOTO_MAX, PHOTO_MAX, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: PHOTO_QUALITY })
+    .jpeg({ quality: PHOTO_QUALITY, ...JPEG_OPTS })
     .toBuffer();
 }
 
@@ -93,7 +97,7 @@ async function makeCrop(viewable) {
   return sharp(rotated.data)
     .extract({ left, top, width: cw, height: ch })
     .resize(PHOTO_MAX, PHOTO_MAX, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: PHOTO_QUALITY })
+    .jpeg({ quality: PHOTO_QUALITY, ...JPEG_OPTS })
     .toBuffer();
 }
 

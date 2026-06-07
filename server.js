@@ -24,6 +24,10 @@ const PHOTO_QUALITY = 82;
 // dimension (0.4 → the middle 40% × 40%). Smaller = harder to recognise the
 // place. The full photo is revealed via the "Help" button.
 const CROP_FRACTION = 0.4;
+// Shared JPEG encoder tuning. mozjpeg's trellis quantisation shrinks files
+// ~20-30% at the SAME visual quality; progressive renders the image top-down
+// as it streams. Applied to every JPEG we emit (quality is set per-output).
+const JPEG_OPTS = { mozjpeg: true, progressive: true };
 
 let MANIFEST = [];                 // [{ id, name, hasGps, lat, lng, thumb, crop, full }]
 const thumbCache = new Map();      // name -> JPEG Buffer (pins / panel)
@@ -105,7 +109,7 @@ app.get('/thumb/:name', async function (req, res) {
       buf = await sharp(viewable.buffer)
         .rotate()
         .resize(THUMB_SIZE, THUMB_SIZE, { fit: 'cover', position: 'centre' })
-        .jpeg({ quality: THUMB_QUALITY })
+        .jpeg({ quality: THUMB_QUALITY, ...JPEG_OPTS })
         .toBuffer();
       thumbCache.set(name, buf);
     }
@@ -129,7 +133,7 @@ app.get('/photo/:name', async function (req, res) {
       buf = await sharp(viewable.buffer)
         .rotate()
         .resize(PHOTO_MAX, PHOTO_MAX, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: PHOTO_QUALITY })
+        .jpeg({ quality: PHOTO_QUALITY, ...JPEG_OPTS })
         .toBuffer();
       photoCache.set(name, buf);
     }
@@ -161,7 +165,7 @@ app.get('/crop/:name', async function (req, res) {
       buf = await sharp(rotated.data)
         .extract({ left: left, top: top, width: cw, height: ch })
         .resize(PHOTO_MAX, PHOTO_MAX, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: PHOTO_QUALITY })
+        .jpeg({ quality: PHOTO_QUALITY, ...JPEG_OPTS })
         .toBuffer();
       cropCache.set(name, buf);
     }
