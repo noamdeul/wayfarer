@@ -53,6 +53,9 @@
     });
   }
 
+  // Never surface the raw photo filename in the UI — show a neutral label.
+  function displayName(item) { return 'Photo ' + item.id; }
+
   // ---------- Load the published photo set ----------
   function load() {
     // Relative URL so it resolves correctly whether the app is served from a
@@ -137,7 +140,7 @@
     L.popup({ closeButton: true, autoClose: true })
       .setLatLng([item.lat, item.lng])
       .setContent(
-        '<div class="popup-name">' + escapeHtml(item.name) + '</div>' +
+        '<div class="popup-name">' + escapeHtml(displayName(item)) + '</div>' +
         '<div class="popup-coords">' + decimalStr(item.lat, item.lng) + '</div>' +
         '<div class="popup-hint">Click the pin to open the photo</div>'
       )
@@ -151,7 +154,7 @@
   function openLightbox(item) {
     lightboxItem = item;
     lightboxImg.src = item.crop || item.full;
-    lightboxName.textContent = item.name;
+    lightboxName.textContent = displayName(item);
     lightboxCoords.textContent = item.status === 'placed' ? fullCoords(item.lat, item.lng) : 'No location found';
     lightboxBadge.hidden = false;
     lightboxHelp.hidden = !(item.crop && item.full);
@@ -192,7 +195,7 @@
 
     var name = document.createElement('div');
     name.className = 'card-name';
-    name.textContent = item.name;
+    name.textContent = displayName(item);
     body.appendChild(name);
 
     var meta = document.createElement('div');
