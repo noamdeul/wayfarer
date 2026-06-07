@@ -186,8 +186,9 @@
     img.src = item.thumb;
     img.alt = '';
     img.loading = 'lazy';
-    img.title = 'Open photo';
-    img.addEventListener('click', function (e) { e.stopPropagation(); openLightbox(item); });
+    img.title = item.status === 'placed' ? 'Zoom to this photo on the map' : 'Open photo';
+    // Let the press bubble up to the card handler below: placed photos zoom the
+    // map to their location, unplaced photos (no coords) open in the lightbox.
     li.appendChild(img);
 
     var body = document.createElement('div');
