@@ -36,7 +36,7 @@ const THUMB_SIZE = 256;
 const THUMB_QUALITY = 72;
 const PHOTO_MAX = 2200;
 const PHOTO_QUALITY = 82;
-const CROP_FRACTION = 0.6;
+const CROP_FRACTION = 0.4;
 
 function mimeFromName(name) {
   if (/\.png$/i.test(name)) return 'image/png';

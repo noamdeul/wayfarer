@@ -20,9 +20,9 @@ const THUMB_QUALITY = 72;
 const PHOTO_MAX = 2200;      // longest-side cap for the lightbox image
 const PHOTO_QUALITY = 82;
 // The default lightbox view is a center crop showing this fraction of each
-// dimension (0.6 → the middle 60% × 60%). Smaller = harder to recognise the
+// dimension (0.4 → the middle 40% × 40%). Smaller = harder to recognise the
 // place. The full photo is revealed via the "Help" button.
-const CROP_FRACTION = 0.6;
+const CROP_FRACTION = 0.4;
 
 let MANIFEST = [];                 // [{ id, name, hasGps, lat, lng, thumb, crop, full }]
 const thumbCache = new Map();      // name -> JPEG Buffer (pins / panel)
