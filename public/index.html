@@ -17,11 +17,21 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">✶</span>
-      <div class="brand-text">
-        <h1>Wayfarer</h1>
-        <p class="tagline">A map of where you&rsquo;ve wandered</p>
+    <div class="topbar-left">
+      <button id="panelToggle" class="panel-toggle" type="button"
+              aria-label="Show the photo list" aria-expanded="false" aria-controls="panel" title="Show the roll">
+        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+          <rect x="3" y="5" width="16" height="2" rx="1"></rect>
+          <rect x="3" y="10" width="16" height="2" rx="1"></rect>
+          <rect x="3" y="15" width="16" height="2" rx="1"></rect>
+        </svg>
+      </button>
+      <div class="brand">
+        <span class="brand-mark">✶</span>
+        <div class="brand-text">
+          <h1>Wayfarer</h1>
+          <p class="tagline">A map of where you&rsquo;ve wandered</p>
+        </div>
       </div>
     </div>
     <div class="topbar-meta" id="topMeta"></div>
@@ -29,7 +39,7 @@
 
   <main class="layout">
     <!-- Side panel: the journal index -->
-    <aside class="panel" id="panel">
+    <aside class="panel collapsed" id="panel">
       <div class="panel-head">
         <h2>The roll</h2>
         <p class="panel-sub" id="panelSummary">Loading the journey&hellip;</p>

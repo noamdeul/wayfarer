@@ -257,6 +257,25 @@
     }
   }
 
+  // ---------- Collapsible side panel ----------
+  // Starts collapsed (the `collapsed` class is set in the markup). The toggle
+  // slides it in/out; the map is re-measured as it animates so tiles fill the
+  // reclaimed space smoothly.
+  var panel = $('panel');
+  var panelToggle = $('panelToggle');
+
+  function setPanelOpen(open) {
+    panel.classList.toggle('collapsed', !open);
+    panelToggle.setAttribute('aria-expanded', String(open));
+    panelToggle.setAttribute('aria-label', open ? 'Hide the photo list' : 'Show the photo list');
+    panelToggle.title = open ? 'Hide the roll' : 'Show the roll';
+    for (var d = 0; d <= 320; d += 80) setTimeout(function () { map.invalidateSize(); }, d);
+  }
+
+  panelToggle.addEventListener('click', function () {
+    setPanelOpen(panel.classList.contains('collapsed'));
+  });
+
   // a gentle nudge to keep the map sized correctly after layout settles
   setTimeout(function () { map.invalidateSize(); }, 200);
   window.addEventListener('resize', function () { map.invalidateSize(); });

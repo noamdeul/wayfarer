@@ -60,7 +60,34 @@ body {
   z-index: 30;
 }
 
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+
 .brand { display: flex; align-items: center; gap: 14px; }
+
+/* ---------- Panel toggle (show/hide the roll) ---------- */
+.panel-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+}
+.panel-toggle:hover { background: var(--paper-3); border-color: var(--ink-faint); }
+.panel-toggle:active { transform: translateY(1px); }
+.panel-toggle svg { fill: currentColor; display: block; }
+/* a quiet "on" state while the panel is open */
+.panel-toggle[aria-expanded="true"] {
+  background: var(--accent-tint);
+  border-color: var(--accent-tint);
+  color: var(--accent-deep);
+}
 
 .brand-mark {
   font-size: 26px;
@@ -143,6 +170,18 @@ body {
   background: var(--paper-2);
   border-right: 1px solid var(--line);
   min-height: 0;
+  overflow: hidden;
+  transition: flex-basis 0.3s ease, opacity 0.25s ease;
+}
+/* Collapsed: slide away to zero width (zero height on the mobile stacked
+   layout) and fade out, letting the map take the full space. */
+.panel.collapsed {
+  flex-basis: 0;
+  min-width: 0;
+  min-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border-color: transparent;
 }
 
 .panel-head {
