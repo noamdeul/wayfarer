@@ -284,6 +284,8 @@
   // ---------- Set switcher ----------
   // Links the header chips to ?set=N (and "All" back to the unfiltered view).
   // Each link is a plain navigation — the page reloads and reads the new ?set.
+  // On desktop the chips sit inline; on narrow screens CSS collapses them behind
+  // the toggle button into a dropdown so the header never overflows.
   function buildSetSwitcher(active) {
     var nav = $('setSwitcher');
     if (!nav) return;
@@ -295,12 +297,39 @@
     }
 
     var base = location.pathname;
-    var html = chip(base, 'All', active == null);
+    var current = active == null ? 'All' : 'Set ' + active;
+
+    var links = chip(base, 'All', active == null);
     for (var s = 1; s <= numSets; s++) {
-      html += chip(base + '?set=' + s, 'Set ' + s, active === s);
+      links += chip(base + '?set=' + s, 'Set ' + s, active === s);
     }
-    nav.innerHTML = html;
+
+    nav.innerHTML =
+      '<button type="button" class="set-menu-btn" id="setMenuBtn" aria-haspopup="true" aria-expanded="false">' +
+        '<span class="set-menu-current">' + current + '</span>' +
+        '<svg class="set-menu-caret" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">' +
+          '<path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>' +
+      '</button>' +
+      '<div class="set-menu-list">' + links + '</div>';
     nav.hidden = false;
+
+    // The toggle is only visible on narrow screens; it opens/closes the dropdown.
+    var btn = $('setMenuBtn');
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', function (e) {
+      if (!nav.contains(e.target)) {
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    });
   }
 
   // ---------- Collapsible side panel ----------
